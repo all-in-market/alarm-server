@@ -25,10 +25,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     defer-datasource-initialization: true
 
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration
-
 management:
   endpoints:
     web:
