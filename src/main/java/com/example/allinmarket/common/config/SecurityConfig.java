@@ -30,6 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories").permitAll()
                         .requestMatchers("/seller/auth/**").permitAll()
+                        .requestMatchers("/internal/**").permitAll()  // 추가
+                        .requestMatchers("/ws/**").permitAll()         // 추가
                         .requestMatchers("/seller/**").hasRole("SELLER")
                         .anyRequest().hasRole("BUYER")
                 )

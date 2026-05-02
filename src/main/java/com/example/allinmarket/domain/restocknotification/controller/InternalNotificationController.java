@@ -1,6 +1,7 @@
 package com.example.allinmarket.domain.restocknotification.controller;
 
 import com.example.allinmarket.domain.restocknotification.dto.RestockEventRequest;
+import com.example.allinmarket.domain.restocknotification.service.RestockNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

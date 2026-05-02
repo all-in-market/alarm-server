@@ -1,14 +1,16 @@
 package com.example.allinmarket.domain.restocknotification.service;
 
+import com.example.allinmarket.common.enums.ErrorEnum;
+import com.example.allinmarket.common.exception.BaseException;
 import com.example.allinmarket.domain.restocknotification.dto.RestockNotificationResponse;
 import com.example.allinmarket.domain.restocknotification.entity.RestockNotification;
 import com.example.allinmarket.domain.restocknotification.repository.RestockNotificationRepository;
+import com.example.allinmarket.domain.restocknotification.sender.RestockNotificationSender;
 import com.example.allinmarket.domain.restocksubscription.entity.RestockSubscription;
 import com.example.allinmarket.domain.restocksubscription.enums.SubscriptionStatusEnum;
 import com.example.allinmarket.domain.restocksubscription.repository.RestockSubscriptionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,33 +21,32 @@ import java.util.List;
 @Slf4j
 public class RestockNotificationService {
 
-    private RestockSubscriptionRepository subscriptionRepository;
+    private final RestockSubscriptionRepository subscriptionRepository;
     private final RestockNotificationRepository notificationRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final RestockNotificationSender restockNotificationSender;
 
-    @Transactional
     public void notify(Long productId) {
         List<RestockSubscription> subscriptions = subscriptionRepository
                 .findAllByProductIdAndStatus(productId, SubscriptionStatusEnum.ACTIVE);
 
-        for(RestockSubscription subscription : subscriptions) {
-            try{
-                RestockNotification notification = notificationRepository.save(
-                        RestockNotification.of(subscription.getUserId(), productId)
-                );
+        subscriptions.forEach(subscription ->
+                restockNotificationSender.send(subscription, productId)
+        );
+    }
 
-                messagingTemplate.convertAndSendToUser(
-                        subscription.getUserId().toString(),
-                        "/queue/notifications",
-                        RestockNotificationResponse.from(notification)
-                );
+    // RestockNotificationService.java에 추가
+    public List<RestockNotificationResponse> getUnread(Long userId) {
+        return notificationRepository.findAllByUserIdAndIsReadFalse(userId)
+                .stream()
+                .map(RestockNotificationResponse::from)
+                .toList();
+    }
 
-                subscription.send();
-
-            } catch (Exception e) {
-                log.error("알림 발송 실패: userId = {}, productId = {}",
-                        subscription.getUserId(), productId, e);
-            }
-        }
+    @Transactional
+    public void markAsRead(Long userId, Long notificationId) {
+        RestockNotification notification = notificationRepository
+                .findByIdAndUserId(notificationId, userId)
+                .orElseThrow(() -> new BaseException(ErrorEnum.NOTIFICATION_NOT_FOUND));
+        notification.read();
     }
 }
