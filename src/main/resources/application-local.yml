@@ -1,0 +1,13 @@
+spring:
+  data:
+    redis:
+      ssl:
+        enabled: false
+dummy:
+  enabled: false
+  batch-type:
+  category-count: 100
+  seller-count: 10000
+  buyer-cart-count: 300000
+  product-count: 1000000
+  address-count: 300000
