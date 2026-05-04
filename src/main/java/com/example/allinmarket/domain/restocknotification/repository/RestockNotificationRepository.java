@@ -7,7 +7,4 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RestockNotificationRepository extends JpaRepository<RestockNotification, Long> {
-
-    List<RestockNotification> findAllByUserIdAndIsReadFalse(Long userId);
-    Optional<RestockNotification> findByIdAndUserId(Long id, Long userId);
 }
