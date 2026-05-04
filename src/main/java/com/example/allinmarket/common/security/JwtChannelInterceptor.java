@@ -2,6 +2,7 @@ package com.example.allinmarket.common.security;
 
 import com.example.allinmarket.common.enums.ErrorEnum;
 import com.example.allinmarket.common.exception.BaseException;
+import com.example.allinmarket.realtimechat.enums.RealtimeChatSenderType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -9,10 +10,11 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.Collections;
 
 @Component
 @Slf4j
@@ -26,43 +28,41 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            String token = accessor.getFirstNativeHeader("Authorization");
-
-            if (token == null || !token.startsWith("Bearer ")) {
-                throw new BaseException(ErrorEnum.UNAUTHORIZED);
-            }
-
-            token = token.substring(7);
-
-            if (!jwtProvider.validateToken(token)) {
-                throw new BaseException(ErrorEnum.UNAUTHORIZED);
-            }
-
-            Long userId = jwtProvider.getUserId(token);
-            log.info("WebSocket principal 설정: {}", userId);
-            accessor.setUser(() -> userId.toString());
-
-            Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-            if (sessionAttributes != null) {
-                sessionAttributes.put("userId", userId.toString());
-            }
-
-            return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
-        }
-
-        // SUBSCRIBE 등 이후 프레임: session attributes에서 userId 복원
-        // StompSubProtocolHandler는 HTTP 핸드셰이크 principal만 전파하므로 직접 설정해야 함
-        if (accessor.getCommand() != null) {
-            Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-            if (sessionAttributes != null) {
-                String userId = (String) sessionAttributes.get("userId");
-                if (userId != null) {
-                    accessor.setUser(() -> userId);
-                    return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
-                }
-            }
+            authenticate(accessor);
         }
 
         return message;
+    }
+
+    private void authenticate(StompHeaderAccessor accessor) {
+        String authHeader = accessor.getFirstNativeHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new BaseException(ErrorEnum.UNAUTHORIZED);
+        }
+
+        String token = authHeader.substring(7);
+
+        // 토큰 유효성 검사 (실패 시 예외 발생, 연결 거부)
+        if (!jwtProvider.validateToken(token)) {
+            throw new BaseException(ErrorEnum.UNAUTHORIZED);
+        }
+
+        Long userId = jwtProvider.getUserId(token);
+        RealtimeChatSenderType senderType = jwtProvider.getSenderType(token);
+
+        // Principal 세팅
+        UserPrincipal principal = new UserPrincipal(userId, senderType);
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(
+                        principal,
+                        null,
+                        Collections.emptyList()
+                );
+
+        accessor.setUser(authentication);
+
+        log.info("WebSocket 인증 성공: userId={}", userId);
     }
 }

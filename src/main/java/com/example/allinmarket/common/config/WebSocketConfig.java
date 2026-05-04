@@ -31,8 +31,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/queue", "/user");
+        // topic -> broadcast용, queue -> 개인 알림용
+        registry.enableSimpleBroker("/queue", "/topic");
+        // websocket 통해 client action 받을 거면 필요(알림 읽음 처리, ping, typing 등). 일단 두는 게 표준
         registry.setApplicationDestinationPrefixes("/app");
+        // "/user/queue/notifications" 활성화 (중요)
         registry.setUserDestinationPrefix("/user");
     }
 

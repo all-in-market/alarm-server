@@ -25,11 +25,11 @@ public class RestockNotificationSender {
             RestockNotification notification = notificationRepository.save(
                     RestockNotification.of(subscription.getUserId(), productId)
             );
-
+            // Spring이 /user/{session}/queue/notifications 형태로 자동 변환
             messagingTemplate.convertAndSendToUser(
                     subscription.getUserId().toString(),
                     "/queue/notifications",
-                    RestockNotificationResponse.from(notification)
+                    RestockNotificationResponse.from(notification) // payload
             );
             log.info("알림 발송 완료: userId={}, destination=/user/{}/queue/notifications",
                     subscription.getUserId(), subscription.getUserId());

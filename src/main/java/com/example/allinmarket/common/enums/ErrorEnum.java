@@ -93,7 +93,10 @@ public enum ErrorEnum {
     STATISTICS_NOT_FOUND(404, "존재하지 않는 통계 데이터입니다."),
 
     // Notificaions
-    NOTIFICATION_NOT_FOUND(404, "알림이 존재하지 않습니다.");
+    NOTIFICATION_NOT_FOUND(404, "알림이 존재하지 않습니다."),
+
+    // Chat
+    SENDER_TYPE_INVALID(400, "잘못된 SENDER_TYPE 입니다.");
 
     private final int status;
     private final String message;
