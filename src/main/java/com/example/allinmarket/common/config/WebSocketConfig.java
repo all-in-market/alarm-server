@@ -11,9 +11,12 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+
+import java.security.Principal;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -45,10 +48,25 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+                StompHeaderAccessor accessor =
+                        MessageHeaderAccessor.getAccessor(
+                                message,
+                                StompHeaderAccessor.class
+                        );
                 if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-                    log.info("SUBSCRIBE 수신: destination={}, user={}",
-                            accessor.getDestination(), accessor.getUser());
+                    Principal user = accessor.getUser();
+                    log.info("SUBSCRIBE 수신: destination={}, user={}, sessionId = {}",
+                            accessor.getDestination(),
+                            user != null ? user.getName() : null,
+                            accessor.getSessionId());
+                    log.info(
+                            "SUBSCRIBE headers={}",
+                            accessor.toNativeHeaderMap()
+                    );
+                    log.info(
+                            "SUBSCRIBE simpUser={}",
+                            accessor.getHeader("simpUser")
+                    );
                 }
                 return message;
             }

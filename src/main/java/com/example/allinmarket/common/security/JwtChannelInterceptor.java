@@ -1,8 +1,8 @@
 package com.example.allinmarket.common.security;
 
 import com.example.allinmarket.common.enums.ErrorEnum;
+import com.example.allinmarket.common.enums.UserRole;
 import com.example.allinmarket.common.exception.BaseException;
-import com.example.allinmarket.realtimechat.enums.RealtimeChatSenderType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -10,6 +10,8 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -25,10 +27,22 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor accessor =
+                MessageHeaderAccessor.getAccessor(
+                        message,
+                        StompHeaderAccessor.class
+                );
+
+        if (accessor == null) {
+            return message;
+        }
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             authenticate(accessor);
+            return MessageBuilder.createMessage(
+                    message.getPayload(),
+                    accessor.getMessageHeaders()
+            );
         }
 
         return message;
@@ -49,10 +63,10 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         }
 
         Long userId = jwtProvider.getUserId(token);
-        RealtimeChatSenderType senderType = jwtProvider.getSenderType(token);
+        UserRole userRole = jwtProvider.getRole(token);
 
         // Principal 세팅
-        UserPrincipal principal = new UserPrincipal(userId, senderType);
+        UserPrincipal principal = new UserPrincipal(userId, userRole);
 
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
@@ -62,7 +76,10 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 );
 
         accessor.setUser(authentication);
+        accessor.setLeaveMutable(true);
 
-        log.info("WebSocket 인증 성공: userId={}", userId);
+        log.info("WebSocket 인증 성공: userId={}, user = {}, sessionId = {}", userId,
+                accessor.getUser(),
+                accessor.getSessionId());
     }
 }

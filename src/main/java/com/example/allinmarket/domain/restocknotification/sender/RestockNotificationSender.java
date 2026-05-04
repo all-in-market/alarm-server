@@ -21,10 +21,10 @@ public class RestockNotificationSender {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void send(RestockSubscription subscription, Long productId) {
+        RestockNotification notification = notificationRepository.save(
+                RestockNotification.of(subscription.getUserId(), productId)
+        );
         try {
-            RestockNotification notification = notificationRepository.save(
-                    RestockNotification.of(subscription.getUserId(), productId)
-            );
             // Spring이 /user/{session}/queue/notifications 형태로 자동 변환
             messagingTemplate.convertAndSendToUser(
                     subscription.getUserId().toString(),
@@ -33,12 +33,10 @@ public class RestockNotificationSender {
             );
             log.info("알림 발송 완료: userId={}, destination=/user/{}/queue/notifications",
                     subscription.getUserId(), subscription.getUserId());
-
-            subscription.send();
-
         } catch (Exception e) {
-            log.error("알림 발송 실패: userId = {}, productId = {}",
+            log.warn("알림 발송 실패: userId = {}, productId = {}",
                     subscription.getUserId(), productId, e);
         }
+        subscription.send();
     }
 }
