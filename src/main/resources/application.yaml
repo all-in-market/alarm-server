@@ -36,7 +36,7 @@ jwt:
   expiration: ${JWT_EXPIRATION:86400000} # 하루
 
 server:
-  port: 8084
+  port: 8083
 
 seller:
   email: ${SELLER_ID}
