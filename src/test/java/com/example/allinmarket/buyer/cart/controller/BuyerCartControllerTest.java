@@ -17,6 +17,7 @@ import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTe
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,6 +43,9 @@ public class BuyerCartControllerTest {
 
     @MockitoBean
     private BuyerCartService buyerCartService;
+
+    @MockitoBean
+    StringRedisTemplate redisTemplate;
 
     @BeforeEach
     void setUp() {

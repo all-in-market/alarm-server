@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,9 @@ class SellerSettlementControllerTest {
 
     @MockitoBean
     private SellerSettlementService sellerSettlementService;
+
+    @MockitoBean
+    StringRedisTemplate redisTemplate;
 
     @Test
     void 판매자_정산내역_조회_성공_테스트() {

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
@@ -30,6 +31,9 @@ public class BuyerAuthControllerTest {
 
     @MockitoBean
     private BuyerAuthService buyerAuthService;
+
+    @MockitoBean
+    StringRedisTemplate redisTemplate;
 
     @Test
     void 회원_가입_성공_테스트() {

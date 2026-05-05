@@ -13,6 +13,7 @@ import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTe
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
@@ -36,6 +37,9 @@ public class BuyerProductControllerTest {
 
     @MockitoBean
     private BuyerProductService buyerProductService;
+
+    @MockitoBean
+    StringRedisTemplate redisTemplate;
 
     @Test
     @WithMockUser
