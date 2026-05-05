@@ -19,6 +19,10 @@ repositories {
 }
 
 dependencies {
+
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     // BOM
     testImplementation platform('org.testcontainers:testcontainers-bom:1.21.3')
 
@@ -43,9 +47,6 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:4.3.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-
-    // Kafka
-    implementation 'org.springframework.boot:spring-boot-starter-kafka'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

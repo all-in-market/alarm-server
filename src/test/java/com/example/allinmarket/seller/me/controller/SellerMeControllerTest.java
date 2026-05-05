@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,8 +40,9 @@ public class SellerMeControllerTest {
     @MockitoBean
     private SellerMeService sellerMeService;
 
-    // SecurityUtils가 (Long) authentication.getPrincipal()로 캐스팅하므로
-    // principal을 반드시 Long 타입으로 설정해야 합니다.
+    @MockitoBean
+    StringRedisTemplate redisTemplate;
+
     private void setAuthContext(Long userId) {
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(userId, null, List.of());

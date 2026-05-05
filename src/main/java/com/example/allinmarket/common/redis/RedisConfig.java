@@ -1,5 +1,6 @@
 package com.example.allinmarket.common.redis;
 
+import com.example.allinmarket.common.redis.enums.RedisChannels;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -8,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -49,5 +53,32 @@ public class RedisConfig {
         template.afterPropertiesSet();
 
         return template;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisContainer(
+            RedisConnectionFactory connectionFactory,
+            MessageListenerAdapter listenerAdapter
+    ) {
+        RedisMessageListenerContainer container =
+                new RedisMessageListenerContainer();
+
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(
+                listenerAdapter,
+                new PatternTopic(RedisChannels.NOTIFICATION)
+        );
+
+        return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter listenerAdapter(
+            RedisSubscriber subscriber
+    ) {
+        MessageListenerAdapter adapter =
+                new MessageListenerAdapter(subscriber, "onMessage");
+        adapter.setSerializer(RedisSerializer.json());
+        return adapter;
     }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -33,6 +34,9 @@ public class SellerDashBoardControllerTest {
 
     @MockitoBean
     private SellerDashboardService sellerDashboardService;
+
+    @MockitoBean
+    StringRedisTemplate redisTemplate;
 
     private void setAuthContext(Long userId) {
         UsernamePasswordAuthenticationToken auth =
