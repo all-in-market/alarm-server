@@ -47,3 +47,8 @@ app:
     admin:
       enabled: false
 
+notification:
+  auth:
+    client-id: ${CUSTOMER_SERVER}
+    secret: ${SERVER_SECRET_KEY}
+
