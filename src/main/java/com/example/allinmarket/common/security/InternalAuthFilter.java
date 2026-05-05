@@ -1,8 +1,11 @@
 package com.example.allinmarket.common.security;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +17,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
@@ -68,13 +73,9 @@ public class InternalAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        ContentCachingRequestWrapper wrappedRequest =
-                new ContentCachingRequestWrapper(request, 4096);
-
-        String body = StreamUtils.copyToString(
-                wrappedRequest.getInputStream(),
-                StandardCharsets.UTF_8
-        );
+        // body를 원본 스트림에서 한 번 읽어 바이트 배열로 캐싱
+        byte[] bodyBytes = StreamUtils.copyToByteArray(request.getInputStream());
+        String body = new String(bodyBytes, StandardCharsets.UTF_8);
 
         long now = Instant.now().getEpochSecond();
         long requestTime;
@@ -150,7 +151,27 @@ public class InternalAuthFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext()
                 .setAuthentication(authentication);
 
-        filterChain.doFilter(wrappedRequest, response);
+        // getInputStream() 호출마다 새 스트림을 반환하는 wrapper로 교체
+        HttpServletRequestWrapper reReadableRequest = new HttpServletRequestWrapper(request) {
+            @Override
+            public ServletInputStream getInputStream() {
+                ByteArrayInputStream bais = new ByteArrayInputStream(bodyBytes);
+                return new ServletInputStream() {
+                    @Override public int read() throws IOException { return bais.read(); }
+                    @Override public boolean isFinished() { return bais.available() == 0; }
+                    @Override public boolean isReady() { return true; }
+                    @Override public void setReadListener(ReadListener listener) {}
+                };
+            }
+
+            @Override
+            public BufferedReader getReader() {
+                return new BufferedReader(new InputStreamReader(
+                        new ByteArrayInputStream(bodyBytes), StandardCharsets.UTF_8));
+            }
+        };
+
+        filterChain.doFilter(reReadableRequest, response);
 
     }
 
