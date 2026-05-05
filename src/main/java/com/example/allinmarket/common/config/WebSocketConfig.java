@@ -59,11 +59,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             accessor.getDestination(),
                             user != null ? user.getName() : null,
                             accessor.getSessionId());
-                    log.info(
-                            "SUBSCRIBE headers={}",
-                            accessor.toNativeHeaderMap()
-                    );
-                    log.info(
+                    log.debug(
                             "SUBSCRIBE simpUser={}",
                             accessor.getHeader("simpUser")
                     );

@@ -13,9 +13,6 @@ public class RedisSubscriber {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-//    public void onMessage(Object message) {
-//        log.info("Redis raw message received={}", message);
-//    }
     public void onMessage(NotificationEvent event) {
         log.info("Redis event received={}", event);
         messagingTemplate.convertAndSendToUser(
@@ -24,10 +21,6 @@ public class RedisSubscriber {
                 event
         );
 
-        log.info(
-                "Redis 알림 수신 및 websocket 전송 완료: userId={}, notificationId={}",
-                event.userId(),
-                event.notificationId()
-        );
+        log.debug("Redis 알림 수신 및 websocket 전송 완료");
     }
 }
