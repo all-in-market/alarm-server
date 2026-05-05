@@ -7,6 +7,7 @@ import com.example.allinmarket.domain.restocksubscription.repository.RestockSubs
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class RestockNotificationService {
     private final RestockSubscriptionRepository subscriptionRepository;
     private final RestockNotificationSender restockNotificationSender;
 
+    @Transactional
     public void notify(Long productId) {
         List<RestockSubscription> subscriptions = subscriptionRepository
                 .findAllByProductIdAndStatus(productId, SubscriptionStatusEnum.ACTIVE);
