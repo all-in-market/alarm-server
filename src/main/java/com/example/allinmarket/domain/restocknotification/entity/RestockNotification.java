@@ -8,10 +8,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "restock_notifications", uniqueConstraints = {
-        @UniqueConstraint(
-                name = "uk_restock_notification_user_product",
-                columnNames = {"user_id", "product_id"}
+@Table(name = "restock_notifications",
+        indexes = {
+        @Index(
+                name = "idx_restock_notifications_user_created_at",
+                columnList = "user_id, created_at"
         )
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
