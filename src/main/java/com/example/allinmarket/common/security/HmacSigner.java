@@ -13,6 +13,13 @@ public class HmacSigner {
     private static final String ALGORITHM = "HmacSHA256";
 
     public static String sign(String secret, String message) {
+
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalArgumentException("secret must not be null or blank");
+        }
+        if (message == null || message.isBlank()) {
+            throw new IllegalArgumentException("message must not be null or blank");
+        }
         try {
             Mac mac = Mac.getInstance(ALGORITHM);
             SecretKeySpec keySpec = new SecretKeySpec(
@@ -29,6 +36,7 @@ public class HmacSigner {
             return Base64.getEncoder().encodeToString(hmac);
 
         } catch (Exception e) {
+            log.error("HMAC signing failed", e);
             throw new IllegalStateException("HMAC signing failed", e);
         }
     }
