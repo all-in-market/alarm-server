@@ -21,7 +21,7 @@ public class RestockNotificationSender {
     private final RestockNotificationRepository notificationRepository;
     private final RedisPublisher redisPublisher;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void send(RestockSubscription subscription, Long productId) {
         RestockNotification notification = notificationRepository.save(
                 RestockNotification.of(subscription.getUserId(), productId)
