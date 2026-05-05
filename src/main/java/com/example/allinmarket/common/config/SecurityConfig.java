@@ -39,10 +39,10 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(
                         internalAuthFilter,
-                        JwtAuthenticationFilter.class)
-                .addFilterBefore(
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(
                         jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                        InternalAuthFilter.class);
 
         return http.build();
     }
