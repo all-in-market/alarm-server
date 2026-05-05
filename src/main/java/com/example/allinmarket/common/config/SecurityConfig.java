@@ -1,5 +1,6 @@
 package com.example.allinmarket.common.config;
 
+import com.example.allinmarket.common.security.InternalAuthFilter;
 import com.example.allinmarket.common.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final InternalAuthFilter internalAuthFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -30,12 +32,17 @@ public class SecurityConfig {
                         .requestMatchers("/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories").permitAll()
                         .requestMatchers("/seller/auth/**").permitAll()
-                        .requestMatchers("/internal/**").permitAll()  // 추가
+                        .requestMatchers("/internal/**").hasRole("INTERNAL_CLIENT")
                         .requestMatchers("/ws/**").permitAll()         // 추가
                         .requestMatchers("/seller/**").hasRole("SELLER")
                         .anyRequest().hasRole("BUYER")
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        internalAuthFilter,
+                        JwtAuthenticationFilter.class)
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
