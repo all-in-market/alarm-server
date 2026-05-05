@@ -1,7 +1,6 @@
 package com.example.allinmarket.common.redis;
 
 import com.example.allinmarket.common.redis.enums.RedisChannels;
-import com.example.allinmarket.domain.restocknotification.dto.RestockNotificationResponse;
 import com.example.allinmarket.domain.restocknotification.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
