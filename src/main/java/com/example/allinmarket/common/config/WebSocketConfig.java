@@ -53,6 +53,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                                 message,
                                 StompHeaderAccessor.class
                         );
+                if (accessor == null) {
+                    return message;
+                }
                 if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
                     Principal user = accessor.getUser();
                     log.info("SUBSCRIBE 수신: destination={}, user={}, sessionId = {}",
