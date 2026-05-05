@@ -8,11 +8,6 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
-  kafka:
-    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}
-    listener:
-      auto-startup: false  # 테스트 시 Kafka 리스너 자동 시작 안 함
-
   jpa:
     hibernate:
       ddl-auto: create-drop  # 테스트 시작 시 테이블 생성, 종료 시 삭제

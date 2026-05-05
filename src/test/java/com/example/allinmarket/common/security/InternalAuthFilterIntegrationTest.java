@@ -120,7 +120,7 @@ class InternalAuthFilterIntegrationTest {
     @Test
     @DisplayName("만료된 타임스탬프(10분 전) 요청은 401을 반환한다")
     void expiredTimestamp_returns401() throws Exception {
-        String timestamp = String.valueOf(Instant.now().getEpochSecond() - 600);
+        String timestamp = String.valueOf(Instant.now().minusSeconds(600));
         String requestId = UUID.randomUUID().toString();
 
         // 서명은 올바르게 생성하여 타임스탬프 검증에서 먼저 차단됨을 확인
