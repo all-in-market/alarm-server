@@ -5,7 +5,7 @@ import com.example.allinmarket.common.enums.SuccessEnum;
 import com.example.allinmarket.common.response.ApiResponse;
 import com.example.allinmarket.common.response.PageResponse;
 import com.example.allinmarket.common.security.SecurityUtils;
-import com.example.allinmarket.domain.restocknotification.dto.RestockNotificationDetailResponse;
+import com.example.allinmarket.domain.notification.restocknotification.dto.RestockNotificationDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

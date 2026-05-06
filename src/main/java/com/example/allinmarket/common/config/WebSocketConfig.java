@@ -29,10 +29,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("https://hyu1335.cloud")
-                .setAllowedOriginPatterns("http://hyu1335.cloud")
-                .setAllowedOriginPatterns("http://localhost:8080")
-                .setAllowedOriginPatterns("http://localhost:8081");
+                .setAllowedOriginPatterns(
+                        "https://hyu1335.cloud",
+                        "http://localhost:8080",
+                        "http://localhost:8081");
     }
 
     @Override

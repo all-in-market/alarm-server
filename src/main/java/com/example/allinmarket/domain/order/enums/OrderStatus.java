@@ -6,14 +6,15 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OrderStatus {
-    CREATED("CREATED"),
-    PAID("PAID"),
-    SHIPPED("SHIPPED"),
-    DELIVERED("DELIVERED"),
-    REFUNDED("REFUNDED"),
-    FAILED("FAILED");
+    CREATED("CREATED", "주문이 생성되었습니다."),
+    PAID("PAID", "결제가 완료되었습니다."),
+    SHIPPED("SHIPPED", "배송이 시작되었습니다."),
+    DELIVERED("DELIVERED", "배송이 완료되었습니다."),
+    REFUNDED("REFUNDED", "환불 완료된 주문입니다."),
+    FAILED("FAILED", "실패 처리된 주문입니다.");
 
     private final String status;
+    private final String message;
 
     public boolean canTransitToTargetStatus(OrderStatus targetStatus) {
         if(targetStatus == null){

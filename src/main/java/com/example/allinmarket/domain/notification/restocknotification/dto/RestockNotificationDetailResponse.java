@@ -1,6 +1,6 @@
-package com.example.allinmarket.domain.restocknotification.dto;
+package com.example.allinmarket.domain.notification.restocknotification.dto;
 
-import com.example.allinmarket.domain.restocknotification.entity.RestockNotification;
+import com.example.allinmarket.domain.notification.restocknotification.entity.RestockNotification;
 
 public record RestockNotificationDetailResponse(
         Long buyerId,

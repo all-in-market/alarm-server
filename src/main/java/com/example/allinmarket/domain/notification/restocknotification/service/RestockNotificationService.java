@@ -1,6 +1,6 @@
-package com.example.allinmarket.domain.restocknotification.service;
+package com.example.allinmarket.domain.notification.restocknotification.service;
 
-import com.example.allinmarket.domain.restocknotification.sender.RestockNotificationSender;
+import com.example.allinmarket.domain.notification.restocknotification.sender.RestockNotificationSender;
 import com.example.allinmarket.domain.restocksubscription.entity.RestockSubscription;
 import com.example.allinmarket.domain.restocksubscription.enums.SubscriptionStatusEnum;
 import com.example.allinmarket.domain.restocksubscription.repository.RestockSubscriptionRepository;
