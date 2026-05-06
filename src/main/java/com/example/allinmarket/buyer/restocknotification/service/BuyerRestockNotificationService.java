@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RestockNotificationService {
+public class BuyerRestockNotificationService {
 
     private final BuyerRepository buyerRepository;
     private final RestockNotificationRepository restockNotificationRepository;

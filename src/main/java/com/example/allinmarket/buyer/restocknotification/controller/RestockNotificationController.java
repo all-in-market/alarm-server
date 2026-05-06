@@ -1,6 +1,6 @@
 package com.example.allinmarket.buyer.restocknotification.controller;
 
-import com.example.allinmarket.buyer.restocknotification.service.RestockNotificationService;
+import com.example.allinmarket.buyer.restocknotification.service.BuyerRestockNotificationService;
 import com.example.allinmarket.common.enums.SuccessEnum;
 import com.example.allinmarket.common.response.ApiResponse;
 import com.example.allinmarket.common.response.PageResponse;
@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/restock-notifications")
 public class RestockNotificationController {
 
-    private final RestockNotificationService restockNotificationService;
+    private final BuyerRestockNotificationService buyerRestockNotificationService;
 
     // 안읽은 알림 전체 조회
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<PageResponse<RestockNotificationDetailResponse>>> getNotifications(Pageable pageable) {
         Long buyerId = SecurityUtils.getCurrentUserId();
-        PageResponse<RestockNotificationDetailResponse> result = restockNotificationService.getNotifications(buyerId, pageable);
+        PageResponse<RestockNotificationDetailResponse> result = buyerRestockNotificationService.getNotifications(buyerId, pageable);
 
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessEnum.READ_SUCCESS, result)
@@ -33,7 +33,7 @@ public class RestockNotificationController {
     @PutMapping("/me")
     public ResponseEntity<ApiResponse<Void>> readAllNotifications() {
         Long buyerId = SecurityUtils.getCurrentUserId();
-        restockNotificationService.readAllNotifications(buyerId);
+        buyerRestockNotificationService.readAllNotifications(buyerId);
 
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessEnum.UPDATE_SUCCESS, null)
@@ -44,7 +44,7 @@ public class RestockNotificationController {
     @PutMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> readNotification(@PathVariable Long productId) {
         Long buyerId = SecurityUtils.getCurrentUserId();
-        restockNotificationService.readNotification(buyerId, productId);
+        buyerRestockNotificationService.readNotification(buyerId, productId);
 
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessEnum.UPDATE_SUCCESS, null)
