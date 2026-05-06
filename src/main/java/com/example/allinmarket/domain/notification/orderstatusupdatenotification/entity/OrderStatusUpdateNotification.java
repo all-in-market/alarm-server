@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "order_status_update_notification")
+@Table(name = "order_status_update_notifications")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderStatusUpdateNotification extends ModifiableEntity {
     @Id
