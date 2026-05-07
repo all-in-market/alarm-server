@@ -58,27 +58,43 @@ public class RedisConfig {
     @Bean
     public RedisMessageListenerContainer redisContainer(
             RedisConnectionFactory connectionFactory,
-            MessageListenerAdapter listenerAdapter
+            MessageListenerAdapter restockListenerAdapter,
+            MessageListenerAdapter orderListenerAdapter
     ) {
         RedisMessageListenerContainer container =
                 new RedisMessageListenerContainer();
 
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(
-                listenerAdapter,
-                new PatternTopic(RedisChannels.NOTIFICATION)
+                restockListenerAdapter,
+                new PatternTopic(RedisChannels.RESTOCK_NOTIFICATION)
+        );
+        container.addMessageListener(
+                orderListenerAdapter,
+                new PatternTopic(RedisChannels.ORDER_STATUS_UPDATE_NOTIFICATION)
         );
 
         return container;
     }
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(
+    public MessageListenerAdapter restockListenerAdapter(
             RedisSubscriber subscriber
     ) {
         MessageListenerAdapter adapter =
-                new MessageListenerAdapter(subscriber, "onMessage");
+                new MessageListenerAdapter(subscriber, "onRestockMessage");
         adapter.setSerializer(RedisSerializer.json());
         return adapter;
+    }
+
+    @Bean
+    public MessageListenerAdapter orderListenerAdapter(
+            RedisSubscriber subscriber
+    ) {
+        MessageListenerAdapter adapter =
+                new MessageListenerAdapter(subscriber, "onOrderStatusMessage");
+        adapter.setSerializer(RedisSerializer.json());
+        return adapter;
+
     }
 }

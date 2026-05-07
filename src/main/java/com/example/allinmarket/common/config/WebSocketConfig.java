@@ -29,10 +29,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("https://hyu1335.cloud")
-                .setAllowedOriginPatterns("http://hyu1335.cloud")
-                .setAllowedOriginPatterns("http://localhost:8080")
-                .setAllowedOriginPatterns("http://localhost:8081");
+                .setAllowedOriginPatterns(
+                        "https://jiangxy.github.io", // TODO: 배포 전 삭제! WebSocket 테스트용 주소.
+                        "https://hyu1335.cloud");
     }
 
     @Override

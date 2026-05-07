@@ -1,4 +1,4 @@
-package com.example.allinmarket.domain.restocknotification.entity;
+package com.example.allinmarket.domain.notification.restocknotification.entity;
 
 import com.example.allinmarket.common.entity.ModifiableEntity;
 import jakarta.persistence.*;
