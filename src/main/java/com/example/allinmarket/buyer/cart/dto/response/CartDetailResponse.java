@@ -1,6 +1,5 @@
 package com.example.allinmarket.buyer.cart.dto.response;
 
-import com.example.allinmarket.buyer.cartitem.dto.CartItemDetailResponse;
 import com.example.allinmarket.common.response.PageResponse;
 import com.example.allinmarket.domain.cart.entity.Cart;
 import org.springframework.data.domain.Page;

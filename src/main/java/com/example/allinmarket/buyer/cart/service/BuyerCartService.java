@@ -3,7 +3,7 @@ package com.example.allinmarket.buyer.cart.service;
 import com.example.allinmarket.buyer.cart.dto.request.AddProductToCartRequest;
 import com.example.allinmarket.buyer.cart.dto.request.UpdateCartItemQuantityRequest;
 import com.example.allinmarket.buyer.cart.dto.response.CartDetailResponse;
-import com.example.allinmarket.buyer.cartitem.dto.CartItemDetailResponse;
+import com.example.allinmarket.buyer.cart.dto.response.CartItemDetailResponse;
 import com.example.allinmarket.common.enums.ErrorEnum;
 import com.example.allinmarket.common.exception.BaseException;
 import com.example.allinmarket.domain.cart.entity.Cart;

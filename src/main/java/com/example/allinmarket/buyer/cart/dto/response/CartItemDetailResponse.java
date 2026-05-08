@@ -1,4 +1,4 @@
-package com.example.allinmarket.buyer.cartitem.dto;
+package com.example.allinmarket.buyer.cart.dto.response;
 
 import com.example.allinmarket.domain.cartitem.entity.CartItem;
 
