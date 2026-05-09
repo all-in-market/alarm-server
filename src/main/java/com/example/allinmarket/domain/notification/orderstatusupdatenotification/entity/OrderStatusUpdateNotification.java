@@ -18,6 +18,7 @@ public class OrderStatusUpdateNotification extends ModifiableEntity {
 
     private Long userId;
     private Long orderId;
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String message;
     private boolean isRead;
