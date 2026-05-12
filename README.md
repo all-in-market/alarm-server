@@ -17,10 +17,16 @@ Redis Pub/Sub과 WebSocket을 활용하여 재입고 알림 및 주문 상태 �
 
 # 2. 📡 주요 API
 
-| Method | URI                      | Description     |
-|--------|--------------------------|-----------------|
-| POST   | /internal/notifications/restock | 재입고 알림 발송 API   |
-| POST   | /internal/notifications/orders            | 주문 상태 알림 발송 API |
+| Method | URI                                | Description         |
+|--|------------------------------------|---------------------|
+| POST | /internal/notifications/orders     | 주문 상태 알림 발송 API     |
+| GET | /order-notifications/me            | 주문 알림 목록 조회 API     |
+| PUT | /order-notifications/me            | 주문 알림 전체 읽음 처리 API  |
+| PUT | /order-notifications/{orderId}     | 주문 알림 개별 읽음 처리 API  |
+| POST | /internal/notifications/restock    | 재입고 알림 발송 API       |
+| GET | /restock-notifications/me          | 재입고 알림 목록 조회   API  |
+| PUT | /restock-notifications/me          | 재입고 알림 전체 읽음 처리 API |
+| PUT  | /restock-notifications/{productId} | 재입고 알림 개별 읽음 처리API  |
 
 <br>
 
