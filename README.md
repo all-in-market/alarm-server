@@ -66,6 +66,8 @@ sequenceDiagram
     WebSocket-->>Client: 실시간 재입고 알림 전송
 ```
 
+<br>
+
 ---
 
 ## 주문 상태 변경 알림
@@ -107,6 +109,8 @@ sequenceDiagram
     WebSocket-->>Client: 주문 상태 변경 알림 전송
 ```
 
+<br>
+
 ---
 
 ## WebSocket 인증 흐름
@@ -134,6 +138,8 @@ sequenceDiagram
     WebSocket-->>Client: 연결 성공
 ```
 
+<br>
+
 ---
 
 ## Redis Pub/Sub 구조
@@ -152,6 +158,8 @@ flowchart LR
 
     E --> F["사용자 WebSocket 세션"]
 ```
+
+<br>
 
 ---
 
@@ -188,6 +196,8 @@ sequenceDiagram
     Controller-->>Client: notification response
 ```
 
+<br>
+
 ---
 
 ## Internal API 보안 흐름
@@ -210,6 +220,8 @@ flowchart TD
 
     G --> H["Internal API 실행"]
 ```
+
+<br>
 
 ---
 
