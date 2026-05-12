@@ -28,39 +28,188 @@ Redis Pub/Sub과 WebSocket을 활용하여 재입고 알림 및 주문 상태 �
 
 # 3. 🔄 서비스 플로우
 
-## 기능 플로우
+## 재입고 알림
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant Server
-    participant Redis
-    participant DB
 
-    Client->>Server: 요청
-    Server->>Redis: 캐시 조회
-    Redis-->>Server: 데이터 반환
-    Server->>DB: 데이터 조회
-    DB-->>Server: 결과 반환
-    Server-->>Client: 응답
+    participant APIServer
+    participant InternalAPI
+    participant AuthFilter
+    participant RestockService
+    participant RestockSender
+    participant RedisPublisher
+    participant Redis
+    participant RedisSubscriber
+    participant WebSocket
+    participant Client
+
+    APIServer->>InternalAPI: POST /internal/notifications/restock
+
+    InternalAPI->>AuthFilter: HMAC 인증 검증
+    AuthFilter-->>InternalAPI: 인증 성공
+
+    InternalAPI->>RestockService: notify(productId)
+
+    RestockService->>RestockSender: send(subscription)
+
+    RestockSender->>RestockSender: 알림 DB 저장
+
+    RestockSender->>RedisPublisher: publishRestockEvent()
+
+    RedisPublisher->>Redis: Pub/Sub publish
+
+    Redis->>RedisSubscriber: 이벤트 전달
+
+    RedisSubscriber->>WebSocket: convertAndSendToUser()
+
+    WebSocket-->>Client: 실시간 재입고 알림 전송
 ```
 
-<br>
+---
 
-## 실시간 처리 플로우
+## 주문 상태 변경 알림
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant ChatServer
-    participant Redis
 
-    User->>ChatServer: 메시지 전송
-    ChatServer->>Redis: Pub/Sub 발행
-    Redis-->>ChatServer: 메시지 브로드캐스트
+    participant APIServer
+    participant InternalAPI
+    participant AuthFilter
+    participant OrderService
+    participant OrderSender
+    participant RedisPublisher
+    participant Redis
+    participant RedisSubscriber
+    participant WebSocket
+    participant Client
+
+    APIServer->>InternalAPI: POST /internal/notifications/orders
+
+    InternalAPI->>AuthFilter: HMAC 인증 검증
+
+    AuthFilter-->>InternalAPI: 인증 성공
+
+    InternalAPI->>OrderService: notify(request)
+
+    OrderService->>OrderSender: send(buyerId, orderId, status)
+
+    OrderSender->>OrderSender: 알림 저장
+
+    OrderSender->>RedisPublisher: publishOrderStatusUpdateEvent()
+
+    RedisPublisher->>Redis: Pub/Sub publish
+
+    Redis->>RedisSubscriber: 이벤트 전달
+
+    RedisSubscriber->>WebSocket: convertAndSendToUser()
+
+    WebSocket-->>Client: 주문 상태 변경 알림 전송
 ```
 
-<br>
+---
+
+## WebSocket 인증 흐름
+
+```mermaid
+sequenceDiagram
+
+    participant Client
+    participant WebSocket
+    participant JwtChannelInterceptor
+    participant JwtProvider
+
+    Client->>WebSocket: CONNECT + Authorization Header
+
+    WebSocket->>JwtChannelInterceptor: CONNECT 이벤트 가로채기
+
+    JwtChannelInterceptor->>JwtProvider: validateToken()
+
+    JwtProvider-->>JwtChannelInterceptor: 토큰 검증 성공
+
+    JwtChannelInterceptor->>JwtProvider: getUserId(), getRole()
+
+    JwtChannelInterceptor-->>WebSocket: Principal 저장
+
+    WebSocket-->>Client: 연결 성공
+```
+
+---
+
+## Redis Pub/Sub 구조
+
+```mermaid
+flowchart LR
+
+    A["주문/재입고 알림 생성"]
+        --> B["RedisPublisher"]
+
+    B --> C["Redis Channel"]
+
+    C --> D["RedisSubscriber"]
+
+    D --> E["SimpMessagingTemplate"]
+
+    E --> F["사용자 WebSocket 세션"]
+```
+
+---
+
+## 알림 조회 및 읽음 처리 흐름
+
+```mermaid
+sequenceDiagram
+
+    participant Client
+    participant Controller
+    participant SecurityUtils
+    participant Service
+    participant Repository
+    participant DB
+
+    Client->>Controller: GET /notifications/me
+
+    Controller->>SecurityUtils: getCurrentUserId()
+
+    SecurityUtils-->>Controller: buyerId
+
+    Controller->>Service: getNotifications(buyerId)
+
+    Service->>Repository: findByUserId()
+
+    Repository->>DB: SELECT notifications
+
+    DB-->>Repository: notification list
+
+    Repository-->>Service: result
+
+    Service-->>Controller: PageResponse
+
+    Controller-->>Client: notification response
+```
+
+---
+
+## Internal API 보안 흐름
+
+```mermaid
+flowchart TD
+
+    A["외부 서비스 요청"]
+        --> B["InternalAuthFilter"]
+
+    B --> C["Header 검증"]
+
+    C --> D["Timestamp 검증"]
+
+    D --> E["HMAC Signature 검증"]
+
+    E --> F["Redis Replay 공격 방지"]
+
+    F --> G["SecurityContext 인증 저장"]
+
+    G --> H["Internal API 실행"]
+```
 
 ---
 
