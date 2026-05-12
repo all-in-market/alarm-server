@@ -66,9 +66,8 @@ sequenceDiagram
 
 # 4. 🗂️ ERD
 
-```md
-![ERD](이미지_URL)
-```
+
+![ERD](/docs/image/AlarmServerERD.png)
 
 <br>
 
