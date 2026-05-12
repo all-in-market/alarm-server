@@ -28,7 +28,8 @@ Redis Pub/Sub과 WebSocket을 활용하여 재입고 알림 및 주문 상태 �
 
 # 3. 🔄 서비스 플로우
 
-## 재입고 알림
+<details>
+<summary><h2>재입고 알림</h2></summary>
 
 ```mermaid
 sequenceDiagram
@@ -65,12 +66,14 @@ sequenceDiagram
 
     WebSocket-->>Client: 실시간 재입고 알림 전송
 ```
+</details>
 
 <br>
 
 ---
 
-## 주문 상태 변경 알림
+<details>
+<summary><h2>주문 상태 변경 알림</h2></summary>
 
 ```mermaid
 sequenceDiagram
@@ -108,12 +111,14 @@ sequenceDiagram
 
     WebSocket-->>Client: 주문 상태 변경 알림 전송
 ```
+</details>
 
 <br>
 
 ---
 
-## WebSocket 인증 흐름
+<details>
+<summary><h2>WebSocket 인증 흐름</h2></summary>
 
 ```mermaid
 sequenceDiagram
@@ -137,12 +142,14 @@ sequenceDiagram
 
     WebSocket-->>Client: 연결 성공
 ```
+</details>
 
 <br>
 
 ---
 
-## Redis Pub/Sub 구조
+<details>
+<summary><h2>Redis Pub/Sub 구조</h2></summary>
 
 ```mermaid
 flowchart LR
@@ -158,12 +165,14 @@ flowchart LR
 
     E --> F["사용자 WebSocket 세션"]
 ```
+</details>
 
 <br>
 
 ---
 
-## 알림 조회 및 읽음 처리 흐름
+<details>
+<summary><h2>알림 조회 및 읽음 처리 흐름</h2></summary>
 
 ```mermaid
 sequenceDiagram
@@ -195,12 +204,14 @@ sequenceDiagram
 
     Controller-->>Client: notification response
 ```
+</details>
 
 <br>
 
 ---
 
-## Internal API 보안 흐름
+<details>
+<summary><h2>Internal API 보안 흐름</h2></summary>
 
 ```mermaid
 flowchart TD
@@ -220,6 +231,7 @@ flowchart TD
 
     G --> H["Internal API 실행"]
 ```
+</details>
 
 <br>
 
