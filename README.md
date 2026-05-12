@@ -321,7 +321,7 @@ HMAC 서명 방식은 `timestamp + requestId + body`를 secret으로 서명하�
 
 ### 문제
 
-`CONNECT` 프레임에서는 `accessor.getUser()`가 정상적으로 존재했지만, 이후 `SUBSCRIBE` 프레임에서는 `null`로 확인되어 `convertAndSendToUser()`가 메시지를 전달할 세션을 식별하지 못할 가능성이 있었다.
+`CONNECT` 프레임에서는 `accessor.getUser()`가 정상적으로 존재했지만, 이후 `SUBSCRIBE` 프레임에서는 `null`로 확인되어 `convertAndSendToUser()`가 메시지를 전달할 세션을 식별하지 못해 제대로 전송이 이루어지지 않았다.
 
 ### 원인
 
