@@ -8,7 +8,7 @@
 
 ## 서버 소개
 
-알림 서버는 멀티벤더 마켓플레이스 플랫폼의 알림 기능을 담당하는 서버입니다.
+알림 서버는 AllInMarket의 알림 기능을 담당하는 서버입니다.
 Redis Pub/Sub과 WebSocket을 활용하여 재입고 알림 및 주문 상태 변경 알림을 구매자에게 실시간으로 전달합니다.
 
 <br>
@@ -34,82 +34,91 @@ Redis Pub/Sub과 WebSocket을 활용하여 재입고 알림 및 주문 상태 �
 ```mermaid
 sequenceDiagram
 
-    participant APIServer
-    participant InternalAPI
-    participant AuthFilter
-    participant RestockService
-    participant RestockSender
-    participant RedisPublisher
-    participant Redis
-    participant RedisSubscriber
-    participant WebSocket
-    participant Client
-
-    APIServer->>InternalAPI: POST /internal/notifications/restock
-
-    InternalAPI->>AuthFilter: HMAC 인증 검증
-    AuthFilter-->>InternalAPI: 인증 성공
-
-    InternalAPI->>RestockService: notify(productId)
-
-    RestockService->>RestockSender: send(subscription)
-
-    RestockSender->>RestockSender: 알림 DB 저장
-
-    RestockSender->>RedisPublisher: publishRestockEvent()
-
-    RedisPublisher->>Redis: Pub/Sub publish
-
-    Redis->>RedisSubscriber: 이벤트 전달
-
-    RedisSubscriber->>WebSocket: convertAndSendToUser()
-
-    WebSocket-->>Client: 실시간 재입고 알림 전송
+    participant APIServer
+    participant InternalAuthFilter
+    participant InternalNotificationController
+    participant RestockNotificationService
+    participant RestockSender
+    participant RedisPublisher
+    participant Redis
+    participant RedisSubscriber
+    participant WebSocket
+    participant JwtChannelInterceptor
+    participant Client
+ 
+    Client->>JwtChannelInterceptor: CONNECT + Authorization Header
+    JwtChannelInterceptor->>JwtChannelInterceptor: JWT 검증 및 Principal 저장
+    JwtChannelInterceptor->>WebSocket: CONNECT (Principal 포함)
+ 
+    APIServer->>InternalAuthFilter: POST /internal/notifications/restock
+ 
+    InternalAuthFilter->>InternalAuthFilter: HMAC 서명 검증
+ 
+    InternalAuthFilter->>InternalNotificationController: HTTP Request
+ 
+    InternalNotificationController->>RestockNotificationService: notify(request.productId())
+ 
+    RestockNotificationService->>RestockSender: send(subscription)
+ 
+    RestockSender->>RestockSender: 알림 DB 저장
+ 
+    RestockSender->>RedisPublisher: publishRestockEvent()
+ 
+    RedisPublisher->>Redis: Pub/Sub publish
+ 
+    Redis->>RedisSubscriber: 이벤트 전달
+ 
+    RedisSubscriber->>WebSocket: convertAndSendToUser()
+ 
+    WebSocket-->>Client: 실시간 재입고 알림 전송
 ```
 </details>
-
 <br>
-
 ---
-
+ 
 <details>
 <summary><h2>주문 상태 변경 알림</h2></summary>
 
 ```mermaid
 sequenceDiagram
-
-    participant APIServer
-    participant InternalAPI
-    participant AuthFilter
-    participant OrderService
-    participant OrderSender
-    participant RedisPublisher
-    participant Redis
-    participant RedisSubscriber
-    participant WebSocket
-    participant Client
-
-    APIServer->>InternalAPI: POST /internal/notifications/orders
-
-    InternalAPI->>AuthFilter: HMAC 인증 검증
-
-    AuthFilter-->>InternalAPI: 인증 성공
-
-    InternalAPI->>OrderService: notify(request)
-
-    OrderService->>OrderSender: send(buyerId, orderId, status)
-
-    OrderSender->>OrderSender: 알림 저장
-
-    OrderSender->>RedisPublisher: publishOrderStatusUpdateEvent()
-
-    RedisPublisher->>Redis: Pub/Sub publish
-
-    Redis->>RedisSubscriber: 이벤트 전달
-
-    RedisSubscriber->>WebSocket: convertAndSendToUser()
-
-    WebSocket-->>Client: 주문 상태 변경 알림 전송
+ 
+    participant APIServer
+    participant InternalAuthFilter
+    participant InternalNotificationController
+    participant OrderStatusNotificationService
+    participant OrderSender
+    participant RedisPublisher
+    participant Redis
+    participant RedisSubscriber
+    participant WebSocket
+    participant JwtChannelInterceptor
+    participant Client
+ 
+    Client->>JwtChannelInterceptor: CONNECT + Authorization Header
+    JwtChannelInterceptor->>JwtChannelInterceptor: JWT 검증 및 Principal 저장
+    JwtChannelInterceptor->>WebSocket: CONNECT (Principal 포함)
+ 
+    APIServer->>InternalAuthFilter: POST /internal/notifications/orders
+ 
+    InternalAuthFilter->>InternalAuthFilter: HMAC 서명 검증
+ 
+    InternalAuthFilter->>InternalNotificationController: HTTP Request
+ 
+    InternalNotificationController->>OrderStatusNotificationService: notify(request.productId())
+ 
+    OrderStatusNotificationService->>OrderSender: send(buyerId, orderId, status)
+ 
+    OrderSender->>OrderSender: 알림 저장
+ 
+    OrderSender->>RedisPublisher: publishOrderStatusUpdateEvent()
+ 
+    RedisPublisher->>Redis: Pub/Sub publish
+ 
+    Redis->>RedisSubscriber: 이벤트 전달
+ 
+    RedisSubscriber->>WebSocket: convertAndSendToUser()
+ 
+    WebSocket-->>Client: 주문 상태 변경 알림 전송
 ```
 </details>
 
@@ -122,25 +131,31 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    autonumber
 
     participant Client
-    participant WebSocket
-    participant JwtChannelInterceptor
-    participant JwtProvider
+    participant Interceptor as JwtChannelInterceptor
+    participant JWT as JwtProvider
+    participant WS as WebSocket
 
-    Client->>WebSocket: CONNECT + Authorization Header
+    Client->>WS: CONNECT + JWT Token
 
-    WebSocket->>JwtChannelInterceptor: CONNECT 이벤트 가로채기
+    WS->>Interceptor: preSend()
 
-    JwtChannelInterceptor->>JwtProvider: validateToken()
+    Interceptor->>JWT: validateToken()
 
-    JwtProvider-->>JwtChannelInterceptor: 토큰 검증 성공
+    alt 인증 성공
+        JWT-->>Interceptor: Valid Token
 
-    JwtChannelInterceptor->>JwtProvider: getUserId(), getRole()
+        Interceptor->>Interceptor: Principal 생성
 
-    JwtChannelInterceptor-->>WebSocket: Principal 저장
+        Interceptor-->>WS: 연결 허용
 
-    WebSocket-->>Client: 연결 성공
+    else 인증 실패
+        JWT-->>Interceptor: Invalid Token
+
+        Interceptor-->>Client: 연결 거부
+    end
 ```
 </details>
 
