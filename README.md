@@ -58,7 +58,7 @@ sequenceDiagram
  
     APIServer->>InternalAuthFilter: POST /internal/notifications/restock
  
-    InternalAuthFilter->>InternalAuthFilter: HMAC 서명 검증
+    InternalAuthFilter->>InternalAuthFilter: HMAC-SHA256 서명 검증
  
     InternalAuthFilter->>InternalNotificationController: HTTP Request
  
@@ -79,7 +79,9 @@ sequenceDiagram
     WebSocket-->>Client: 실시간 재입고 알림 전송
 ```
 </details>
+
 <br>
+
 ---
  
 <details>
@@ -106,7 +108,7 @@ sequenceDiagram
  
     APIServer->>InternalAuthFilter: POST /internal/notifications/orders
  
-    InternalAuthFilter->>InternalAuthFilter: HMAC 서명 검증
+    InternalAuthFilter->>InternalAuthFilter: HMAC-SHA256 서명 검증
  
     InternalAuthFilter->>InternalNotificationController: HTTP Request
  
@@ -306,7 +308,7 @@ WebSocket + STOMP의 User Destination(`/user/queue/notifications`)을 활용해 
 
 ---
 
-## 내부 호출용 HMAC 서명 인증 및 전용 권한 처리
+## 내부 호출용 HMAC-SHA256 서명 인증 및 전용 권한 처리
 
 ### 배경
 
@@ -315,11 +317,11 @@ WebSocket + STOMP의 User Destination(`/user/queue/notifications`)을 활용해 
 
 ### 기술 선택지
 
-|비교 항목|API Key 방식|HMAC 서명 방식|
-|---|---|---|
-|위변조 방지|불가 (탈취 시 그대로 재사용 가능)|가능 (body 포함 서명으로 변조 감지)|
-|재전송 공격 방어|불가|가능 (timestamp + requestId 검증)|
-|구현 복잡도|낮음|중간|
+|비교 항목|API Key 방식| HMAC-SHA256 서명 방식             |
+|---|---|-------------------------------|
+|위변조 방지|불가 (탈취 시 그대로 재사용 가능)| 가능 (body 포함 서명으로 변조 감지)       |
+|재전송 공격 방어|불가| 가능 (timestamp + requestId 검증) |
+|구현 복잡도|낮음| 중간                            |
 
 ### 선택 이유
 
